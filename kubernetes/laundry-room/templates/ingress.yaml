@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "laundry-room.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "laundry-room.labels" . | nindent 4 }}
+spec:
+  rules:
+  - host: {{ template "laundry-room.fullname" . }}--service--{{ .Release.Namespace }}.{{ .Values.ingress.topLevelDomain }}
+    http:
+      paths:
+          - path: {{ .Values.ingress.path }}
+            backend:
+              serviceName: {{ template "laundry-room.fullname" . }}
+              servicePort: {{ .Values.port }}

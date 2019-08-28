@@ -1,0 +1,9 @@
+apiVersion: v1
+appVersion: "1.0"
+description: laundry-room
+name: laundry-room
+version: 0.1.0
+# Please add DL of the team(s) owning the service
+maintainers:
+- name: Simon Aquino
+  email: siaquino@ebay.com

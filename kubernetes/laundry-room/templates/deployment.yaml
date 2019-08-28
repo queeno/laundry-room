@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "laundry-room.fullname" . }}
+  labels: {{ include "laundry-room.labels" . | nindent 4 }}
+  annotations:
+    app.kubernetes.io/Priority: "P1"
+    keel.sh/policy: regexp:^([0-9\-]{19})\.{{ .Values.deployment.branch }}\.([0-9a-f]{5,40})$
+          {{- if .Values.slackChannel }}
+    keel.sh/notify: {{ .Values.slackChannel }}
+        {{ end }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels: {{ include "laundry-room.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+            {{ include "laundry-room.labels" . | nindent 10 }}
+      annotations:
+            {{- if not (empty .Values.podAnnotations) }}
+            {{ include "laundry-room.podAnnotations" . | nindent 10 }}
+          {{- end }}
+    spec:
+            {{- if .Values.podSecurityContext }}
+      securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
+            {{- end }}
+            {{- with .Values.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+            {{- end }}
+            {{- with .Values.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+            {{- end }}
+            {{- with .Values.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+            {{- end }}
+      serviceAccountName: default
+            {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+            {{- end }}
+      containers:
+      - name: {{ template "laundry-room.fullname" . }}
+        image: {{ template "laundry-room.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.targetPort }}
+        readinessProbe: {{ toYaml .Values.readinessProbe | nindent 10 }}
+        livenessProbe: {{ toYaml .Values.livenessProbe | nindent 10 }}
+              {{- if .Values.securityContext }}
+        securityContext: {{ toYaml .Values.securityContext | nindent 10 }}
+              {{- end }}
+              {{- if .Values.resources }}
+        resources: {{ toYaml .Values.resources | nindent 10 }}
+        {{- end }}

@@ -1,0 +1,28 @@
+labels:
+  owner: simonaquino
+
+ingress:
+  path: /
+  topLevelDomain: norix.co.uk
+
+resources:
+  requests:
+    memory: "280M"
+    cpu: "100m"
+  limits:
+    memory: "400M"
+    cpu: "250m"
+
+image:
+  registry: docker.hub.com
+  repository: laundry-room
+  tag: latest
+  pullPolicy: Always
+
+deployment:
+  branch: master
+
+replicas: 3
+
+port: 80
+targetPort: 8080
